@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Gestione Menu Ristornate";
+}
+
+@model List<Pizza>
+
+<div class="d-flex mb-3">
+    <a class="btn btn-outline-dark btn-sm ms-auto" asp-controller="Pizza" asp-action="Create"><i class="fa-sharp fa-solid fa-circle-plus"></i> Inserisci pizza</a>
+</div>
+<div class="d-flex justify-content-center align-items-center ">
+    @if(Model.Count()>0){
+            <table class="table table-hover">
+                <thead>
+                    <tr class="table-dark">
+                        <th scope="col">IMG</th>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Descrizione</th>
+                        <th scope="col">Categoria</th>
+                        <th scope="col">Allergeni</th>
+                        <th scope="col">Visibile</th>
+                        <th scope="col">Azioni</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (Pizza item in Model){
+                    <tr>
+                        @if (string.IsNullOrEmpty(item.Img)){
+                            <td><img src="~/img/placeholder.png" alt="pizza-img" width="100" height="100"></td>
+                        }else{
+                        <td><img src="@item.Img" height="100" width="100"></td>
+                        }
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td>@item.Category.Name</td>
+                        <td>
+                            @foreach (var ing in item.Ingredients)
+                            {
+                                <span style="color: @ing.Color" class="badge rounded-pill">@ing.Icon</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            @if(item.IsVisible){
+                                <button type="button" class="btn btn-sm btn-outline-primary"><i class="fa-sharp fa-solid fa-eye-slash"></i></button>
+                            }else{
+                                <button type="button" class="btn btn-sm btn-outline-secondary"><i class="fa-sharp fa-solid fa-eye"></i></button>
+                            }
+                            
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-outline-warning">Modifica</button>
+                            <button type="button" class="btn btn-sm btn-outline-danger">Cancella</button>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+    } else {
+            <h3>
+                Non sono presenti ancora pizze nel tuo ristorante.
+            </h3>
+}
+</div>
+

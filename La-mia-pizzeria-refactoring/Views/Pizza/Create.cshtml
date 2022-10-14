@@ -1,0 +1,134 @@
+﻿@{
+    ViewData["Title"] = "Aggiungi Pizza";
+}
+@model PizzaViewModel
+
+<div class="d-flex justify-content-end gap-2 mb-3">
+    <a class="btn btn-outline-info btn-sm me-auto" asp-controller="Pizza" asp-action="Index"><i class="fa-sharp fa-solid fa-circle-arrow-left"></i> Torna Lista Pizze</a>
+    <!-- Button trigger Allergeni modal -->
+    <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#ModalAllergeni">
+        <i class="fa-sharp fa-solid fa-circle-plus"></i> Inserisci Allergeni
+    </button>
+    <!-- Modal Allergeni -->
+    <div class="modal fade" id="ModalAllergeni" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Aggiungi Allergene</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-controller="Ingredient" asp-action="Create" method="post">
+                    <div class="modal-body">
+                        <div class="form-group mb-2">
+                            <label asp-for="Ingredient.Name" class="form-label">Nome</label>
+                            <input asp-for="Ingredient.Name" class="form-control">
+                            <span asp-validation-for="Ingredient.Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label asp-for="Ingredient.Icon" class="form-label">Icona</label>
+                            <input asp-for="Ingredient.Icon" class="form-control">
+                            <span asp-validation-for="Ingredient.Icon" class="text-danger"></span>
+                            <small class="form-text text-muted">Scegli la tua icona da qua: <a href="https://fontawesome.com/search?o=r&m=free" target="_blank">icon</a></small>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label asp-for="Ingredient.Color" class="form-label">Colore</label>
+                            <input asp-for="Ingredient.Color" type="color" class="form-control form-control-color" value="#563d7c" title="Scegli il colore">
+                            <span asp-validation-for="Ingredient.Icon" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Allergeni -->
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ModalCategoria">
+        <i class="fa-sharp fa-solid fa-circle-plus"></i> Inserisci Categoria
+    </button>
+    <!-- Modal Categoria -->
+    <div class="modal fade" id="ModalCategoria" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Inserisci Categoria</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-controller="Category" asp-action="Create" method="post">
+                    <div class="modal-body">
+                        <div class="form-group mb-2">
+                            <label asp-for="Category.Name" class="form-label">Nome</label>
+                            <input asp-for="Category.Name" class="form-control">
+                            <span asp-validation-for="Category.Name" class="text-danger"></span>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </form>  
+            </div>
+        </div>
+    </div>
+</div>
+
+<form asp-controller="Pizza" asp-action="Create" method="post">
+    <div class="form-group mb-2">
+        <label asp-for="Pizza.Img" class="form-label">Immagine(url)</label>
+        <input asp-for="Pizza.Img" class="form-control">
+        <span asp-validation-for="Pizza.Img" class="text-danger"></span>
+        <small id="emailHelp" class="form-text text-muted">È Consigliata una dimensione di 500x500(pixel)</small>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Pizza.Name" class="form-label mt-4">Nome Pizza*</label>
+        <input class="form-control" asp-for="Pizza.Name">
+        <span asp-validation-for="Pizza.Name" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Pizza.Description" class="form-label">Descrizione*</label>
+        <textarea asp-for="Pizza.Description" rows="5" class="form-control"></textarea>
+        <span asp-validation-for="Pizza.Description" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+        <label asp-for="Pizza.Price" class="form-label">Prezzo*</label>
+        <div class="input-group">
+            <input asp-for="Pizza.Price" class="form-control">
+            <span class="input-group-text">€</span>
+        </div>
+        <span asp-validation-for="Pizza.Price" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+      <label 
+          asp-for="Pizza.CategoryId" class="form-label mt-4">Selezione Categoria*</label>
+       <select asp-for="Pizza.CategoryId" class="form-select" id="exampleSelect1">
+          @foreach (var category in Model.Categories)
+          {
+             <option value="@category.Id">@category.Name</option>
+          }
+      </select>
+        <span asp-validation-for="Pizza.CategoryId" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-2">
+      <label asp-for="SelectedIngredients" class="form-label mt-4">Seleziona gli Allergeni</label>
+      <select asp-for="SelectedIngredients" multiple="" row="10" class="form-select" id="exampleSelect2">
+        @foreach (var Ingredient in Model.Ingredients)
+        {
+           <option value="@Ingredient.Id">@Ingredient.Name</option>
+        }
+      </select>
+    </div>
+    <div class="form-group mb-2">
+        <label class="mt-4">Visibilitá*</label>
+        <div class="form-check form-switch">
+            <input class="form-check-input" asp-for="Pizza.IsVisible" checked="">
+            <label class="form-check-label" asp-for="Pizza.IsVisible">Pizza Visibile</label>
+        </div>
+    </div>
+    <div class="d-flex justify-content-end gap-2 mb-3">
+        <button type="submit" class="btn btn-primary btn-sm"><i class="fa-sharp fa-solid fa-circle-plus"></i> Aggiungi</button>
+        
+    </div>
+</form>
