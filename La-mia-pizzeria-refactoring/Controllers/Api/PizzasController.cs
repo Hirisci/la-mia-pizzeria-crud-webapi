@@ -14,25 +14,25 @@ namespace La_mia_pizzeria_refactoring.Controllers.Api
     [ApiController]
     public class PizzasController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext _db;
 
-        public PizzasController(AppDbContext context)
+        public PizzasController(AppDbContext db)
         {
-            _context = context;
+            _db = db;
         }
 
         // GET: api/Pizzas
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Pizza>>> GetPizzas()
         {
-            return await _context.Pizzas.ToListAsync();
+            return await _db.Pizzas.Include("Ingredients").Where(x=> x.IsVisible ).ToListAsync();
         }
 
         // GET: api/Pizzas/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Pizza>> GetPizza(int id)
         {
-            var pizza = await _context.Pizzas.FindAsync(id);
+            var pizza = await _db.Pizzas.FindAsync(id);
 
             if (pizza == null)
             {
@@ -52,11 +52,11 @@ namespace La_mia_pizzeria_refactoring.Controllers.Api
                 return BadRequest();
             }
 
-            _context.Entry(pizza).State = EntityState.Modified;
+            _db.Entry(pizza).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _db.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -78,8 +78,8 @@ namespace La_mia_pizzeria_refactoring.Controllers.Api
         [HttpPost]
         public async Task<ActionResult<Pizza>> PostPizza(Pizza pizza)
         {
-            _context.Pizzas.Add(pizza);
-            await _context.SaveChangesAsync();
+            _db.Pizzas.Add(pizza);
+            await _db.SaveChangesAsync();
 
             return CreatedAtAction("GetPizza", new { id = pizza.Id }, pizza);
         }
@@ -88,21 +88,21 @@ namespace La_mia_pizzeria_refactoring.Controllers.Api
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePizza(int id)
         {
-            var pizza = await _context.Pizzas.FindAsync(id);
+            var pizza = await _db.Pizzas.FindAsync(id);
             if (pizza == null)
             {
                 return NotFound();
             }
 
-            _context.Pizzas.Remove(pizza);
-            await _context.SaveChangesAsync();
+            _db.Pizzas.Remove(pizza);
+            await _db.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool PizzaExists(int id)
         {
-            return _context.Pizzas.Any(e => e.Id == id);
+            return _db.Pizzas.Any(e => e.Id == id);
         }
     }
 }

@@ -2,7 +2,81 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome Libero</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+<div id="Display" class="row">
+    <div class="col-xs-12 col-sm-6 col-md-4 col-xl-3">
+        <div class="card mb-3">
+            <svg id="Img" xmlns="http://www.w3.org/2000/svg" class="d-block user-select-none" width="100%" height="200" aria-label="Placeholder: Image cap" focusable="false" role="img" preserveAspectRatio="xMidYMid slice" viewBox="0 0 318 180" style="font-size:1.125rem;text-anchor:middle">
+                <rect width="100%" height="100%" fill="#868e96"></rect>
+                <text x="50%" y="50%" fill="#dee2e6" dy=".3em">Image cap</text>
+            </svg>
+
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <h5 class="card-title">Nome Pizza</h5>
+                    <h5 class="card-title text-muted">Prezzo</h5>
+                </div>
+                <h5 id="Description" class="card-subtitle text-muted mb-2">Descrizione Prodotto</h5>
+                <a href="#" class="card-link">Dettagli</a>
+            </div>
+        </div>
+    </div>
+
+    
+
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@section Scripts {
+<script type="text/javascript">
+    // Make a request for a user with a given ID
+        axios.get("/api/pizzas")
+      .then(function (response) {
+        // handle success
+            let query = response.data;
+            console.log(query);
+            query.forEach( x => {
+                let Col = document.createElement("div");
+                Col.className = "col-xs-12 col-sm-6 col-md-4 col-xl-3";
+                let Card = document.createElement("div");
+                Card.className = "card mb-3";
+                Col.appendChild(Card);
+            });
+            
+          
+                Img = document.createElement("img")
+                CardBody = document.createElement("div");
+                CardBody.className = "card-body";
+                CardTitle = document.createElement("div");
+                CardTitle.className = "d-flex justify-content-between mb-2";
+                H5Title = document.createElement("h5");
+                CardTitle.className = "card-title"
+               
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
+      .then(function () {
+        // always executed
+      });
+
+</script>
+}
+
