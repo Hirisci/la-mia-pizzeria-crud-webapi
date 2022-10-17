@@ -49,24 +49,15 @@ namespace La_mia_pizzeria_refactoring.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create(PizzaViewModel viewModel)
         {
-            //ModelState.Remove("Category.Name");
-            //ModelState.Remove("Category.Pizzas");
-            //ModelState.Remove("Ingredient.Icon");
-            //ModelState.Remove("Ingredient.Name");
-            //ModelState.Remove("Ingredient.Color");
-            //ModelState.Remove("Ingredient.Pizzas");
 
             if (!ModelState.IsValid)
             {
+                viewModel.Ingredients = _db.Ingredients.ToList();
+                viewModel.Categories = _db.Categories.ToList();
                 return View(viewModel);
             }
 
-            if (_db.Pizzas.Where(x => x.Name.ToLower() == viewModel.Pizza.Name.ToLower()).Count() > 0)
-            {
-                _toastNotification.Warning($"{viewModel.Pizza.Name} é gia esistente");
-                return RedirectToAction("Create", "Pizza", viewModel);
-            }
-
+            viewModel.Pizza.Ingredients = _db.Ingredients.Where(x => viewModel.SelectedIngredients.Contains(x.Id)).ToList();
             _db.Pizzas.Add(viewModel.Pizza);
             _db.SaveChanges();
             _toastNotification.Success($"{viewModel.Pizza.Name} aggiunta con successo!");
@@ -77,43 +68,96 @@ namespace La_mia_pizzeria_refactoring.Controllers
         // GET: PizzaController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+
+            Pizza? Pizza = _db.Pizzas.Include("Ingredients").Include("Category").FirstOrDefault(x => x.Id == id);
+
+            if (Pizza == null)
+            {
+                _toastNotification.Error("Errore Interno! Impossibile cancellare la pizza selezionata");
+                return RedirectToAction("Index");
+            }
+
+            PizzaViewModel viewModel = new PizzaViewModel();
+            viewModel.Pizza = Pizza;
+            foreach(var ing in Pizza.Ingredients)
+            {
+                viewModel.SelectedIngredients.ToList().Add(ing.Id);
+            }
+            viewModel.Ingredients = _db.Ingredients.ToList();
+            viewModel.Categories = _db.Categories.ToList();
+
+            return View(viewModel);
         }
 
         // POST: PizzaController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(PizzaViewModel viewModel)
         {
-            try
+            if (!ModelState.IsValid)
             {
+                viewModel.Ingredients = _db.Ingredients.ToList();
+                viewModel.Categories = _db.Categories.ToList();
+                return View(viewModel);
+            }
+
+            if (viewModel.Pizza.Id == null)
+            {
+                _toastNotification.Error("Errore Interno! Impossibile modificare la pizza selezionata");
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+
+            
+            _db.Update(viewModel.Pizza);
+            _db.SaveChanges();
+            _toastNotification.Success($"{viewModel.Pizza.Name} é ora visibile nel Menu");
+            return RedirectToAction(nameof(Index));
         }
 
-        // GET: PizzaController/Delete/5
-        public ActionResult Delete(int id)
+        // Post: PizzaController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Visible(int id)
         {
-            return View();
+            Pizza? Pizza = _db.Pizzas.FirstOrDefault(x => x.Id == id);
+
+            if (Pizza == null)
+            {
+                _toastNotification.Error("Errore Interno! Impossibile cancellare la pizza selezionata");
+                return RedirectToAction(nameof(Index));
+            }
+
+            Pizza.IsVisible = !Pizza.IsVisible;
+            _db.Update(Pizza);
+            _db.SaveChanges();
+
+            if (Pizza.IsVisible)
+            {
+                _toastNotification.Success($"{Pizza.Name} é ora visibile nel Menu");
+            }
+            else
+            {
+                _toastNotification.Success($"{Pizza.Name} non é ora visibile nel Menu");
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: PizzaController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public ActionResult Delete(int id)
         {
-            try
+            Pizza? Pizza = _db.Pizzas.FirstOrDefault(x => x.Id == id);
+
+            if (Pizza == null)
             {
+                _toastNotification.Error("Errore Interno! Impossibile cancellare la pizza selezionata");
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+
+            _db.Pizzas.Remove(Pizza);
+            _db.SaveChanges();
+            return RedirectToAction(nameof(Index));
         }
 
         //public void OnGet()

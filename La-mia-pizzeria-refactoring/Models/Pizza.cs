@@ -1,11 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Policy;
 
 namespace La_mia_pizzeria_refactoring.Models
 {
+    
+    [Index(nameof(Name), IsUnique = true)]
     public class Pizza
     {
-        
+
         public int Id{ get; set; }
 
         [Required]

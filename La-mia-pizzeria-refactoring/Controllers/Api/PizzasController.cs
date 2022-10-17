@@ -23,9 +23,16 @@ namespace La_mia_pizzeria_refactoring.Controllers.Api
 
         // GET: api/Pizzas
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pizza>>> GetPizzas()
+        public async Task<ActionResult<IEnumerable<Pizza>>> GetPizzas(string? name)
         {
-            return await _db.Pizzas.Include("Ingredients").Where(x=> x.IsVisible ).ToListAsync();
+            var listPizze = _db.Pizzas.Where(x => x.IsVisible);
+
+            if (name != null)
+            {
+                listPizze = listPizze.Where(x => x.Name.Contains(name));
+            }
+
+            return await listPizze.ToListAsync();
         }
 
         // GET: api/Pizzas/5

@@ -41,15 +41,24 @@
                         </td>
                         <td class="text-center">
                             @if(item.IsVisible){
-                                <button type="button" class="btn btn-sm btn-outline-primary"><i class="fa-sharp fa-solid fa-eye-slash"></i></button>
+                                <form asp-controller="Pizza" asp-action="Visible" asp-route-id="@item.Id" method="post">
+                                    <button type="submit" class="btn btn-sm btn-outline-primary"><i class="fa-sharp fa-solid fa-eye-slash"></i></button>
+                                </form>
                             }else{
-                                <button type="button" class="btn btn-sm btn-outline-secondary"><i class="fa-sharp fa-solid fa-eye"></i></button>
+
+                                <form asp-controller="Pizza" asp-action="Visible" asp-route-id="@item.Id" method="post">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary"><i class="fa-sharp fa-solid fa-eye"></i></button>
+                                </form>
                             }
                             
                         </td>
                         <td>
-                            <button type="button" class="btn btn-sm btn-outline-warning">Modifica</button>
-                            <button type="button" class="btn btn-sm btn-outline-danger">Cancella</button>
+                            <form asp-controller="Pizza" asp-action="Edit" asp-route-id="@item.Id" method="get">
+                            <button type="submit" class="btn btn-sm btn-outline-warning btn-input">Modifica</button>
+                            </form>
+                            <form asp-controller="Pizza" asp-action="Delete" asp-route-id="@item.Id" method="post">
+                                <button type="submit" class="btn btn-sm btn-outline-danger btn-input">Cancella</button>
+                             </form>
                         </td>
                     </tr>
                     }
