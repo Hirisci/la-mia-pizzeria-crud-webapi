@@ -32,30 +32,12 @@
     </div>
     <div class="form-group mb-2">
         <label asp-for="Pizza.CategoryId" class="form-label mt-4">Selezione Categoria*</label>
-        <select asp-for="Pizza.CategoryId" class="form-select" id="exampleSelect1">
-            @foreach (var category in Model.Categories)
-            {
-                <option value="@category.Id">@category.Name</option>
-            }
-        </select>
-        <span asp-validation-for="Pizza.CategoryId" class="text-danger"></span>
+        <select asp-for="Pizza.CategoryId" asp-items="Model.Categories" class="form-select"></select>
+        <span asp-validation-for="Pizza.CategoryId" asp-items="Model.Category" class="text-danger"></span>
     </div>
     <div class="form-group mb-2">
         <label asp-for="SelectedIngredients" class="form-label mt-4">Seleziona gli Allergeni</label>
-        <select asp-for="SelectedIngredients" multiple="" row="10" class="form-select" id="exampleSelect2">
-            @foreach (var Ingredient in Model.Ingredients)
-            {
-                
-                if (Model.SelectedIngredients.Contains(Ingredient.Id)){
-
-                    <option value="@Ingredient.Id" selected>@Ingredient.Name</option>
-
-                } else {
-                    <option value="@Ingredient.Id">@Ingredient.Name</option>
-                }
-               
-            }
-        </select>
+        <select asp-for="SelectedIngredients" asp-items="Model.Ingredients" multiple row="10"class="form-select"></select>
     </div>
     <div class="form-group mb-2">
         <label class="mt-4">Visibilitá*</label>

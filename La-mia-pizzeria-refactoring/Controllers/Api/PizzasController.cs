@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using La_mia_pizzeria_refactoring.Data;
 using La_mia_pizzeria_refactoring.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace La_mia_pizzeria_refactoring.Controllers.Api
 {
@@ -111,5 +112,6 @@ namespace La_mia_pizzeria_refactoring.Controllers.Api
         {
             return _db.Pizzas.Any(e => e.Id == id);
         }
+
     }
 }

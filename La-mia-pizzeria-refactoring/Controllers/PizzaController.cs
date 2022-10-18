@@ -2,9 +2,13 @@
 using La_mia_pizzeria_refactoring.Data;
 using La_mia_pizzeria_refactoring.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Options;
 
 namespace La_mia_pizzeria_refactoring.Controllers
 {
@@ -39,8 +43,8 @@ namespace La_mia_pizzeria_refactoring.Controllers
         public ActionResult Create()
         {
             PizzaViewModel viewModel = new PizzaViewModel();
-            viewModel.Ingredients = _db.Ingredients.ToList();
-            viewModel.Categories = _db.Categories.ToList();
+            viewModel.Ingredients = SetViewIngredient();
+            viewModel.Categories = SetViewCategory(viewModel.Pizza.CategoryId);
             return View(viewModel);
         }
 
@@ -52,8 +56,8 @@ namespace La_mia_pizzeria_refactoring.Controllers
 
             if (!ModelState.IsValid)
             {
-                viewModel.Ingredients = _db.Ingredients.ToList();
-                viewModel.Categories = _db.Categories.ToList();
+                viewModel.Ingredients = SetViewIngredient();
+                viewModel.Categories = SetViewCategory(viewModel.Pizza.CategoryId);
                 return View(viewModel);
             }
 
@@ -77,14 +81,12 @@ namespace La_mia_pizzeria_refactoring.Controllers
                 return RedirectToAction("Index");
             }
 
+            
             PizzaViewModel viewModel = new PizzaViewModel();
+            viewModel.SelectedIngredients = Pizza.Ingredients.Select(x => x.Id).ToList();
             viewModel.Pizza = Pizza;
-            foreach(var ing in Pizza.Ingredients)
-            {
-                viewModel.SelectedIngredients.ToList().Add(ing.Id);
-            }
-            viewModel.Ingredients = _db.Ingredients.ToList();
-            viewModel.Categories = _db.Categories.ToList();
+            viewModel.Ingredients = SetViewIngredient();
+            viewModel.Categories = SetViewCategory(viewModel.Pizza.CategoryId);
 
             return View(viewModel);
         }
@@ -93,24 +95,22 @@ namespace La_mia_pizzeria_refactoring.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(PizzaViewModel viewModel)
+
         {
             if (!ModelState.IsValid)
             {
-                viewModel.Ingredients = _db.Ingredients.ToList();
-                viewModel.Categories = _db.Categories.ToList();
                 return View(viewModel);
             }
 
-            if (viewModel.Pizza.Id == null)
-            {
-                _toastNotification.Error("Errore Interno! Impossibile modificare la pizza selezionata");
-                return RedirectToAction(nameof(Index));
-            }
-
-            
-            _db.Update(viewModel.Pizza);
+            Pizza Pizza = _db.Pizzas.Include("Ingredients").Include("Category").FirstOrDefault(x => x.Id == viewModel.Pizza.Id)!;
+            Pizza.Name = viewModel.Pizza.Name;
+            Pizza.Description = viewModel.Pizza.Description;
+            Pizza.Price = viewModel.Pizza.Price;
+            Pizza.CategoryId = viewModel.Pizza.CategoryId;
+            Pizza.Ingredients = _db.Ingredients.Where(x => viewModel.SelectedIngredients.Contains(x.Id)).ToList();
+            _db.Pizzas.Update(Pizza);
             _db.SaveChanges();
-            _toastNotification.Success($"{viewModel.Pizza.Name} é ora visibile nel Menu");
+            _toastNotification.Success($"{Pizza.Name} é ora visibile nel Menu");
             return RedirectToAction(nameof(Index));
         }
 
@@ -160,6 +160,30 @@ namespace La_mia_pizzeria_refactoring.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        private List<SelectListItem> SetViewIngredient()
+        {
+
+            List<SelectListItem> selectListItems = _db.Ingredients.Select(a =>
+                                          new SelectListItem
+                                          {
+                                              Value = a.Id.ToString(),
+                                              Text = a.Name,
+                                          }).ToList();
+            return selectListItems;
+        }
+        private List<SelectListItem> SetViewCategory(int CategoryId)
+        {
+
+            List<SelectListItem> selectListItems = _db.Categories.Select(a =>
+                                          new SelectListItem
+                                          {
+                                              Value = a.Id.ToString(),
+                                              Text = a.Name,
+                                              Selected = a.Id == CategoryId,
+                                          }).ToList();
+            return selectListItems;
+        }
         //public void OnGet()
         //{
         //    _toastNotification.Success("A success for christian-schou.dk");

@@ -1,4 +1,6 @@
-﻿namespace La_mia_pizzeria_refactoring.Models
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace La_mia_pizzeria_refactoring.Models
 {
     public class PizzaViewModel
     {
@@ -7,8 +9,9 @@
         public Ingredient Ingredient { get; set; }
         public Category Category { get; set; }
         public IEnumerable<int> SelectedIngredients { get; set; }
-        public IEnumerable<Ingredient> Ingredients { get; set; }
-        public IEnumerable<Category> Categories { get; set; }
+        public IEnumerable<SelectListItem> Ingredients { get; set; }
+
+        public IEnumerable<SelectListItem> Categories { get; set; }
 
         public PizzaViewModel()
         {
@@ -16,8 +19,8 @@
             Ingredient = new Ingredient();
             Category= new Category();
             SelectedIngredients = new List<int>();
-            Ingredients = new List<Ingredient>();
-            Categories = new List<Category>();
+            Ingredients = new List<SelectListItem>();
+            Categories = new List<SelectListItem>();
         }
     }
 }

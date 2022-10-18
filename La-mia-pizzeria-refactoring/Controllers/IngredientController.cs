@@ -4,6 +4,7 @@ using La_mia_pizzeria_refactoring.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace La_mia_pizzeria_refactoring.Controllers
 {
@@ -24,7 +25,9 @@ namespace La_mia_pizzeria_refactoring.Controllers
         // GET: IngredientController
         public ActionResult Index()
         {
-            return View();
+            IngredientViewModel ingredientViewModel = new IngredientViewModel();
+            ingredientViewModel.Ingredients = _db.Ingredients.ToList();
+            return View(ingredientViewModel);
         }
 
         // GET: IngredientController/Details/5
@@ -67,8 +70,8 @@ namespace La_mia_pizzeria_refactoring.Controllers
             _db.Ingredients.Add(viewModel.Ingredient);
             _db.SaveChanges();
 
-            viewModel.Ingredients = _db.Ingredients.ToList();
-            viewModel.Categories = _db.Categories.ToList();
+            viewModel.Ingredients = SetViewIngredient(viewModel.SelectedIngredients);
+            viewModel.Categories = SetViewCategory(viewModel.Pizza.CategoryId);
 
             return RedirectToAction("Create", "Pizza", viewModel);
         }
@@ -114,5 +117,32 @@ namespace La_mia_pizzeria_refactoring.Controllers
                 return View();
             }
         }
+
+        private List<SelectListItem> SetViewIngredient(IEnumerable<int> ingredients)
+        {
+
+            List<SelectListItem> selectListItems = _db.Ingredients.Select(a =>
+                                          new SelectListItem
+                                          {
+                                              Value = a.Id.ToString(),
+                                              Text = a.Name,
+                                              Selected = ingredients.Contains(a.Id)
+                                          }).ToList();
+            return selectListItems;
+        }
+        private List<SelectListItem> SetViewCategory(int CategoryId)
+        {
+
+            List<SelectListItem> selectListItems = _db.Categories.Select(a =>
+                                          new SelectListItem
+                                          {
+                                              Value = a.Id.ToString(),
+                                              Text = a.Name,
+                                              Selected = a.Id == CategoryId,
+                                          }).ToList();
+            return selectListItems;
+        }
+
+
     }
 }
