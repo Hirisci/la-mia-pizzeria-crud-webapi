@@ -16,6 +16,7 @@ namespace La_mia_pizzeria_refactoring.Data
         public DbSet<Pizza> Pizzas { set; get; }
         public DbSet<Category> Categories { set; get; }
         public DbSet<Ingredient> Ingredients { set; get; }
+        public DbSet<Message> Messages { get; set; }
 
 
     }

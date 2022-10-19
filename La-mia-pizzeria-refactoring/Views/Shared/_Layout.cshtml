@@ -22,7 +22,7 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarColor01">
                     <ul class="navbar-nav me-auto">
-                       
+                        <a asp-controller="Message" asp-action="Index" class="nav-link">Recensioni</a>
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -45,6 +45,8 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync("ScriptsAuth", required: false)
+    @await RenderSectionAsync("ScriptsUnAuth", required: false)
     @await Component.InvokeAsync("NToastNotify")
     @await Component.InvokeAsync("Notyf")
 </body>

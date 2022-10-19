@@ -25,7 +25,9 @@ namespace La_mia_pizzeria_refactoring.Controllers
         // GET: CategoryController
         public ActionResult Index()
         {
-            return View();
+            CategoryViewModel viewModel = new CategoryViewModel();
+            viewModel.Categories = _db.Categories.ToList();
+            return View(viewModel);
         }
 
         // GET: CategoryController/Details/5

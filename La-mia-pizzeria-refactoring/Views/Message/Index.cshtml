@@ -1,0 +1,238 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@{
+    ViewData["Title"] = "Gestione Allergeni Menu Ristornate";
+}
+
+<section class="mv-3">
+    <div id="display" class="row w-75 mx-auto text-center"></div>
+</section>
+<section>
+    <div class="w-50 mx-auto">
+        <form>
+            <div class="form-group mb-3">
+                <label for="Email" class="form-label mt-4">Indirizzo Email</label>
+                <input type="email" class="form-control" id="Email" aria-describedby="emailHelp" placeholder="Inserisci email">
+            </div>
+            <div class="form-group  mb-3">
+                <label for="Title" class="form-label mt-4">Titolo</label>
+                <input type="text" class="form-control" id="Title" aria-describedby="Title" placeholder="Inserisci Titolo">
+            </div>
+            <div class="form-group  mb-3">
+                <label for="Text" class="form-label mt-4">Inserisci la tua Recensione</label>
+                <textarea class="form-control" id="Text" rows="5"></textarea>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mb-3">
+                <button type="submit" id="send" class="btn btn-outline-primary btn-sm"><i class="fa-sharp fa-solid fa-circle-plus"></i> Invia</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+
+ @if (SignInManager.IsSignedIn(User)){
+        @section ScriptsAuth {
+        <script type="text/javascript">
+
+            function editMessage(id) {             
+
+                axios.put(`/api/messages/${id}`, {
+                    id: id,
+                    email: document.querySelector(`#Email_Edit_${id}`).value,
+                    titolo: document.querySelector(`#Title_Edit_${id}`).value,
+                    text: document.querySelector(`#Text_Edit_${id}`).value,
+                })
+                    .then(function (response) {
+                        // handle success
+                        console.log(response.data)
+                        location.reload();
+                    })
+                    .catch(function (error) {
+                        // handle error
+                        console.log(error);
+
+                    })
+                    .then(function () {
+                        // always executed
+
+                    });
+            }
+
+            function deleteMessage(id){
+                axios.delete(`/api/messages/${id}`)
+                    .then(function (response) {
+                        // handle success
+                        console.log(response.data)
+                        location.reload();
+                    })
+                    .catch(function (error) {
+                        // handle error
+                        console.log(error);
+
+                    })
+                    .then(function () {
+                        // always executed
+
+                    });
+            }
+
+            
+            // Make a request for a user with a given ID
+            axios.get("/api/messages")
+                .then(function (response) {
+                    // handle success
+                    const DISPLAY = document.querySelector("#display")
+                    let query = response.data;
+                    console.log(query);
+                    DISPLAY.innerHTML = "";
+                    if (query.length > 0) {
+                        query.forEach(message =>
+
+                            DISPLAY.innerHTML += `
+                                <figure>
+                                    <div class="d-flex justify-content-around w-50 mx-auto align-items-center">
+                                        
+                                        <button onclick="deleteMessage(${message.id})" class="btn"><i class="fa-sharp fa-solid fa-circle-trash"></i>A</button>
+                                        <h4 class="m-0">${message.titolo}</h4>
+                                        <button type="button" class="btn btn-outline-warning btn-sm" data-bs-toggle="modal" data-bs-target="#ModalMessage${message.id}">
+                                            <i class="fa-sharp fa-solid fa-circle-plus"></i> E
+                                        </button>
+
+                                        <!-- Modal Allergeni -->
+                                                <div class="modal fade" id="ModalMessage${message.id}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h1 class="modal-title fs-5" id="exampleModalLabel">Modifica Recensione</h1>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <form >
+                                                            <div class="modal-body">
+                                                                <div class="form-group mb-3">
+                                                                    <label for="Email" class="form-label mt-4">Indirizzo Email</label>
+                                                                    <input type="email" class="form-control" id="Email_Edit_${message.id}" aria-describedby="emailHelp" placeholder="Inserisci email" value="${message.email}">
+                                                                </div>
+                                                                <div class="form-group  mb-3">
+                                                                    <label for="Title" class="form-label mt-4">Titolo</label>
+                                                                    <input type="text" class="form-control" id="Title_Edit_${message.id}" aria-describedby="Title" placeholder="Inserisci Titolo" value="${message.titolo}">
+                                                                </div>
+                                                                <div class="form-group  mb-3">
+                                                                    <label for="Text" class="form-label mt-4">Inserisci la tua Recensione</label>
+                                                                    <textarea class="form-control" id="Text_Edit_${message.id}" rows="5">${message.text}</textarea>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                                    <button type="button" onclick="editMessage(${message.id})" class="btn">Modifica</button>
+                                                                </div>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        
+                                    </div>
+                                    <blockquote class="blockquote">
+                                            <p class="mb-0">${message.text}</p>
+                                    </blockquote>
+                                    <figcaption class="blockquote-footer">
+                                    <cite title="Source Title">${message.email}</cite>
+                                    </figcaption>
+                                </figure>
+                                `)
+
+                    } else {
+                        DISPLAY.innerHTML = "<h3> Non sono presenti recensioni sul tuo ristorante </h3>"
+                    }
+                })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+                .then(function () {
+                    // always executed
+                });
+
+                
+
+        </script>
+
+
+
+    }
+    } else {
+        @section ScriptsUnAuth {
+        <script type="text/javascript">
+            // Make a request for a user with a given ID
+            axios.get("/api/messages")
+                .then(function (response) {
+                    // handle success
+                    const DISPLAY = document.querySelector("#display")
+                    let query = response.data;
+                    console.log(query);
+                    DISPLAY.innerHTML = "";
+                    if (query.length > 0) {
+                        query.forEach(message =>
+
+                            DISPLAY.innerHTML += `
+                                    <figure>
+                                        <h4>${message.titolo}</h4>
+                                        <blockquote class="blockquote">
+                                                <p class="mb-0">${message.text}</p>
+                                        </blockquote>
+                                        <figcaption class="blockquote-footer">
+                                        <cite title="Source Title">${message.email}</cite>
+                                        </figcaption>
+                                    </figure>
+                                    `)
+
+                    } else {
+                        DISPLAY.innerHTML = "<h3> Non sono presenti recensioni sul tuo ristorante </h3>"
+                    }
+                })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+                })
+                .then(function () {
+                    // always executed
+                });
+        </script>
+    }
+    }
+
+@section Scripts {
+    <script type="text/javascript">
+
+        const EMAIL = document.querySelector("#Email")
+        const TITLE = document.querySelector("#Title")
+        const TEXT = document.querySelector("#Text")
+        const BTN = document.querySelector("#send")
+
+        BTN.addEventListener("click", myFunction);
+
+        function myFunction(e) {
+            axios.post("/api/messages", {
+                email: EMAIL.value,
+                titolo: TITLE.value,
+                text: TEXT.value,
+            })
+                .then(function (response) {
+                    // handle success
+                    console.log(response)
+                    location.reload();
+
+                })
+                .catch(function (error) {
+                    // handle error
+                    console.log(error);
+
+                })
+                .then(function () {
+                    // always executed
+                    
+                });
+        }
+
+    </script>
+}
